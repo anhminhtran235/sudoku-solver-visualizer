@@ -5,36 +5,52 @@
 // const selected = document.querySelector(".selected");
 // const optionsContainer = document.querySelector(".options-container");
 // const optionsList = document.querySelectorAll(".option");
-// const speedButtonWraper = document.querySelector("#speed-drop-down");
 
-// selected.addEventListener("click", dropMenuFunctionForSelected);
+// selected.addEventListener("click", () => {
+//   optionsContainer.classList.toggle("active");
+// });
 
 // optionsList.forEach(o => {
-//     o.addEventListener("click", () => {
-//       selected.innerHTML = o.querySelector("label").innerHTML;
-//       optionsContainer.classList.remove("active");
-//     });
+//   o.addEventListener("click", () => {
+//     selected.innerHTML = o.querySelector("label").innerHTML;
+//     optionsContainer.classList.remove("active");
 //   });
-// function dropMenuFunctionForSelected()
-// {
-//     optionsContainer.classList.toggle("active");
-// }
+// });
+
+const speedDropDown = document.querySelector("span.selected");
+const speedOptions = document.querySelectorAll('.speed-options');
+speedOptions.forEach(e => {
+    e.addEventListener("click", () => {
+        let value = e.innerHTML;
+        speedDropDown.innerHTML = value;
+        speedSelected = value;
+    });
+});
 
 // Dropdown menu (Speed)
 // Dropdown menu (Speed)
 // Dropdown menu (Speed)
-
+const subMenu = document.querySelector("#nav-bar").children[3].children[1];
+const speedButton = document.querySelector("#nav-bar").children[3].children[0];
+const liAroundDropdownMenu = document.querySelector("#nav-bar").children[3];
 const solve = document.querySelector("#solve");
 const clear = document.querySelector("#clear");
 const randomlyFill = document.querySelector("#randomly-fill");
 const grid = document.querySelector("#grid");
-// const speedDropDown = document.getElementsByName('speed');
+let speedSelected = "fast";
 
 solve.addEventListener('click', clickedSolve);
 clear.addEventListener('click', clickedClear);
 randomlyFill.addEventListener('click', clickedFill);
 
 const inputs = document.getElementsByTagName('input');
+
+// This function is called when we click the "Randomly-fill" button
+function clickedFill(e)
+{
+    clickedClear()  // Clear the board first
+    fill80Succeed20NotSure();
+}
 
 function fill80Succeed20NotSure()
 {
@@ -85,12 +101,63 @@ function mixSudokuQuiz(matrix)
     }
 }
 
-// This function is called when we click the "Randomly-fill" button
-function clickedFill(e)
+function mixRowsAndColumns(matrix)
 {
-    clickedClear()  // Clear the board first
-    fill80Succeed20NotSure();
+    let numSwap = Math.floor(Math.random() * 15) + 1; // Swap 1-10 times
+    while(numSwap > 0)
+    {
+        let num1 = Math.floor(Math.random() * 9);   // Pick a row (or column) from 0 to 8
+        let num2 = Math.floor(num1 / 3) * 3 + Math.floor(Math.random() * 3);
+        if(Math.random() < 0.5)
+        {
+            swapRow(matrix, num1, num2);
+        }
+        else
+        {
+            swapCol(matrix, num1, num2);
+        }
+        numSwap--;
+    }
 }
+
+function keepSomeEntries(matrix, numEntriesKeep)
+{
+    let numEntriesDelete = 81 - numEntriesKeep;
+    for(let i = 0; i < numEntriesDelete; i++)
+    {
+        while(true)
+        {
+            let row = Math.floor(Math.random() * 9);
+            let col = Math.floor(Math.random() * 9);
+            if(matrix[row][col] != 0)
+            {
+                matrix[row][col] = 0;
+                break;
+            }
+        }
+    }
+}
+
+function swapRow(matrix, row1, row2)
+{
+    for(let i = 0; i < 9; i++)
+    {
+        let temp = matrix[row1][i];
+        matrix[row1][i] = matrix[row2][i];
+        matrix[row2][i] = temp;
+    }
+}
+
+function swapCol(matrix, col1, col2)
+{
+    for(let i = 0; i < 9; i++)
+    {
+        let temp = matrix[i][col1];
+        matrix[i][col1] = matrix[i][col2];
+        matrix[i][col2] = temp;
+    }
+}
+
 
 function generateRandomBoard()
 {
@@ -109,7 +176,7 @@ function generateRandomBoard()
     while(true)
     {
         if(numFill === 0)
-            return matrix;
+            break;
         let i = Math.floor(Math.random() * 9);
         let j = Math.floor(Math.random() * 9);
         if(matrix[i][j] == "")
@@ -129,7 +196,7 @@ function clickedClear(e)
 {
     clearAllTimeOuts();
     clearAllColors();
-    solveAllow();
+    setAllowSolveAndSpeed();
     for(let i = 0; i < 9; i++)
     {
         for(let j = 0; j < 9; j++)
@@ -147,12 +214,12 @@ function clickedSolve(e)
     if(verifyInput() == false)
         return;
 
-    // Cursor: Not allow for "Solve" button. 
-    // Basically change effect for "Solve" button
-    solveNotAllow();
-
+    if(speedDropDown.innerHTML === "Speed") // If haven't set speed
+    {
+        speedDropDown.innerHTML = "Medium"; // Set to medium
+    }
+    setNotAllowSolveAndSpeed();
     matrix = readValue();
-    
     solveSudoku(matrix);
     timeAfterAllDone = (++timeCount) * duration;
 
@@ -163,50 +230,8 @@ function clickedSolve(e)
     else
     {
         timeOutID = setTimeout(alertNoSolution, timeAfterAllDone);
+        timeOutID = setTimeout(setAllowSolveAndSpeed, timeAfterAllDone);
     }
-    console.log(matrix);
-
-}
-
-function solveNotAllow()
-{
-    solve.removeEventListener('click', clickedSolve);
-    solve.classList.remove('btn');
-    solve.classList.add('btn-not-allow');
-}
-
-function solveAllow()
-{
-    solve.addEventListener('click', clickedSolve);
-    solve.classList.remove('btn-not-allow');
-    solve.classList.add('btn');
-}
-
-function removeSolveListener(btn)
-{
-    btn.removeEventListener('clickedSolve');
-}
-
-function alertNoSolution()
-{
-    alert("No Solution!");
-}
-
-function solveSucceededAnimation()
-{
-    let currentDuration = timeCount * duration;
-    let succeededDuration = 20;
-    let newCount = 0;
-    for(let row = 0; row < 9; row++)
-    {
-        for(let col = 0; col < 9; col++)
-        {
-            timeOutID = setTimeout(colorCell, 
-                        currentDuration + (newCount++)*succeededDuration, row, col);
-        }
-    }
-    // Phewwww DONE!! Allow to click button again!!!
-    timeOutID = setTimeout(solveAllow, currentDuration + (newCount++)*succeededDuration);
 }
 
 // See if the input is valid
@@ -228,6 +253,28 @@ function verifyInput()
     return true;
 }
 
+function alertNoSolution()
+{
+    alert("No Solution!");
+}
+
+function solveSucceededAnimation()
+{
+    let currentDuration = timeCount * duration;
+    let succeededDuration = 20;
+    let newCount = 0;
+    for(let row = 0; row < 9; row++)
+    {
+        for(let col = 0; col < 9; col++)
+        {
+            timeOutID = setTimeout(colorCell, 
+                        currentDuration + (newCount++)*succeededDuration, row, col);
+        }
+    }
+    timeOutID = setTimeout(setAllowSolveAndSpeed, currentDuration + (newCount++)*succeededDuration);
+
+}
+
 // Read value to 2d array
 function readValue()
 {
@@ -238,6 +285,14 @@ function readValue()
         for(let j = 0; j < 9; j++)
         {
             val = grid.rows[i].cells[j].firstChild.value;
+            
+            // Check if input is valid
+            if(typeof(parseInt(val)) != 'number' || 0 >= parseInt(val) || 9 < parseInt(val))
+            {
+                alert("Please enter numbers from 1 to 9");
+                return;
+            }
+
             matrix[i][j] = (val === "") ? 0 : parseInt(val);
         }
     }
@@ -248,13 +303,12 @@ function solveSudoku(matrix)
 {
     // Set speed
     const FAST_SPEED = 1;
-    const MEDIUM_SPEED = 5; // Set this to 10 if we have speed drop down
+    const MEDIUM_SPEED = 10;
     const SLOW_SPEED = 50;
     duration = MEDIUM_SPEED;
-
-    // if(speedDropDown[0].checked) duration = FAST_SPEED;
-    // else if(speedDropDown[1].checked) duration = MEDIUM_SPEED;
-    // else if(speedDropDown[2].checked) duration = SLOW_SPEED;
+    if(speedDropDown.innerHTML === 'Fast') duration = FAST_SPEED;
+    else if(speedDropDown.innerHTML === 'Medium') duration = MEDIUM_SPEED;
+    else if(speedDropDown.innerHTML === 'Slow') duration = SLOW_SPEED;
     // Done setting speed
 
     timeCount = 0;
@@ -344,25 +398,19 @@ function solveSudokuHelper(matrix, isFixed, row, col, data)
 
 function emptyCell(row, col)
 {
-    let offSet = 0; // Just delete Speed dropdown (fast, slow and medium)
-    // let offSet = 3; // Offset because fast, slow, medium are also inputs
-    inputs[row*9+col+offSet].classList.remove('active');
+    inputs[row*9+col].classList.remove('active');
     grid.rows[row].cells[col].firstChild.value = "";
 }
 
 function fillCell(row, col, val)
 {
-    let offSet = 0; // Just delete Speed dropdown (fast, slow and medium)
-    // let offSet = 3; // Offset because fast, slow, medium are also inputs
-    inputs[row*9+col+offSet].classList.add('active');
+    inputs[row*9+col].classList.add('active');
     grid.rows[row].cells[col].firstChild.value = val;
 }
 
 function colorCell(row, col)
 {
-    let offSet = 0; // Just delete Speed dropdown (fast, slow and medium)
-    // let offSet = 3; // Offset because fast, slow, medium are also inputs
-    inputs[row*9+col+offSet].classList.add('succeeded');
+    inputs[row*9+col].classList.add('succeeded');
 }
 
 function canBeCorrect(matrix, row, col)
@@ -429,59 +477,24 @@ function clearAllColors()
     }
 }
 
-function mixRowsAndColumns(matrix)
+// Helper function
+// Helper function
+// Helper function
+
+function setNotAllowSolveAndSpeed()
 {
-    let numSwap = Math.floor(Math.random() * 15) + 1; // Swap 1-10 times
-    while(numSwap > 0)
-    {
-        let num1 = Math.floor(Math.random() * 9);   // Pick a row (or column) from 0 to 8
-        let num2 = Math.floor(num1 / 3) * 3 + Math.floor(Math.random() * 3);
-        if(Math.random() < 0.5)
-        {
-            swapRow(matrix, num1, num2);
-        }
-        else
-        {
-            swapCol(matrix, num1, num2);
-        }
-        numSwap--;
-    }
+    solve.style.backgroundColor = "red"; 
+    solve.style.cursor = "not-allowed";
+    solve.removeEventListener('click', clickedSolve);
+
+    liAroundDropdownMenu.setAttribute("style", "pointer-events: none");
 }
 
-function keepSomeEntries(matrix, numEntriesKeep)
+function setAllowSolveAndSpeed()
 {
-    let numEntriesDelete = 81 - numEntriesKeep;
-    for(let i = 0; i < numEntriesDelete; i++)
-    {
-        while(true)
-        {
-            let row = Math.floor(Math.random() * 9);
-            let col = Math.floor(Math.random() * 9);
-            if(matrix[row][col] != 0)
-            {
-                matrix[row][col] = 0;
-                break;
-            }
-        }
-    }
-}
+    solve.setAttribute("style", "cursor: pointer");
+    solve.addEventListener('click', clickedSolve);
 
-function swapRow(matrix, row1, row2)
-{
-    for(let i = 0; i < 9; i++)
-    {
-        let temp = matrix[row1][i];
-        matrix[row1][i] = matrix[row2][i];
-        matrix[row2][i] = temp;
-    }
-}
+    liAroundDropdownMenu.setAttribute("style", "cursor: pointer"); // enable dropdown (pointerEvent)
 
-function swapCol(matrix, col1, col2)
-{
-    for(let i = 0; i < 9; i++)
-    {
-        let temp = matrix[i][col1];
-        matrix[i][col1] = matrix[i][col2];
-        matrix[i][col2] = temp;
-    }
 }

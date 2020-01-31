@@ -4,44 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link href="https://fonts.googleapis.com/css?family=Great+Vibes&display=swap" rel="stylesheet">
     <title>Sudoku Solver</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <nav id="nav-bar">
-        <h2>Sudoku Solver Visualization</h2>
-        <li><button class="btn" id="clear">Clear</button>
-        <li><button class="btn" id="solve">Solve</button>
-        <li><button class="btn" id="randomly-fill">Randomly fill</button>
-        <!-- <li>
-            <div id="speed-drop-down" class="btn" class="container">          
-                <div class="select-box">
-                  <div class="options-container">
-                    <div class="option">
-                      <input type="radio"class="radio" id="fast" name="speed"/>
-                      <label for="fast">Fast</label>
-                    </div>
-          
-                    <div class="option">
-                      <input type="radio" class="radio" id="medium" name="speed" />
-                      <label for="medium">Medium</label>
-                    </div>
-          
-                    <div class="option">
-                      <input type="radio" class="radio" id="slow" name="speed" />
-                      <label for="slow">Slow</label>
-                    </div>
-
-                  </div>
-          
-                  <div class="selected">
-                    Speed
-                  </div>
-                </div>
-              </div>
-        </li> -->
+      <h2>Sudoku Solver Visualization</h2>
+      <li id="clear"><span>Clear</span>
+      <li id="solve"><span>Solve</span>
+      <li id="randomly-fill"><span>Randomly fill</span>
+      
+      <li>
+        <span class="selected">Speed</span>
+        <ul class="sub-menu">
+          <li class="speed-options">Fast</li>
+          <li class="speed-options">Medium</li>
+          <li class="speed-options">Slow</li>
+        </ul>
+      </li>
     </nav>
 
 
@@ -56,7 +37,7 @@
                 <td class="cell"><input type="text" maxlength="1"></td>
                 <td class="cell"><input type="text" maxlength="1"></td>
                 <td class="cell"><input type="text" maxlength="1"></td>
-                <td  class="cell"><input type="text" maxlength="1"></td  >
+                <td  class="cell"><input type="text" maxlength="1"></td >
 
                 <!--row--></tr>
             
