@@ -10,10 +10,10 @@
 <body>
 
     <nav id="nav-bar">
-      <h2>Sudoku Solver Visualization</h2>
+      <h2>Sudoku Solver Visualizer</h2>
       <li id="clear"><span>Clear</span>
+      <li id="randomly-fill"><span>Randomly Fill</span>
       <li id="solve"><span>Solve</span>
-      <li id="randomly-fill"><span>Randomly fill</span>
       
       <li>
         <span class="selected">Speed</span>
@@ -23,8 +23,15 @@
           <li class="speed-options">Slow</li>
         </ul>
       </li>
-    </nav>
 
+      <li>
+        <span class="algo-selected">Algorithms</span>
+        <ul class="algo-sub-menu">
+          <li class="algo-options">Backtracking</li>
+          <li class="algo-options">Best First Search</li>
+        </ul>
+      </li>
+    </nav>
 
     <div id="main">
         <table id="grid">

@@ -40,9 +40,14 @@ body
   color: #fff;
   padding: 15px 20px;
   display: inline-block;
-  min-width: 80px;
+  min-width: 80px;     
   font-size: 20px;
   font-weight: bold;
+}
+
+#nav-bar li:nth-child(6)
+{
+  min-width: 180px;
 }
 
 #nav-bar li:hover {
@@ -50,18 +55,21 @@ body
   cursor: pointer;
 }
  
-#nav-bar li:hover .sub-menu {
+#nav-bar li:hover .sub-menu{
+  display: block;
+}
+
+#nav-bar li:hover .algo-sub-menu{
   display: block;
 }
 
 #nav-bar h2
 {
-  position: absolute;
-  left: 2px;
-  color: white;
-  padding: 15px 10px;
+  /* color: rgb(0, 255, 191); */
+  color: rgb(0, 255, 0);
   font-style: italic;
-  font-size: 20px;
+  padding: 10px;
+  font-size: 25px;
 }
 
 .sub-menu {
@@ -73,6 +81,27 @@ body
   text-align: left;
   font-size: 20px;
   font-weight: bold;
+}
+
+.algo-sub-menu {
+  position: absolute;
+  left: 0;
+  top: 53px;
+  background-color: rgb(49, 155, 255);
+  display: none;
+  text-align: left;
+  font-size: 20px;
+  font-weight: bold;
+  min-width: 180px;
+}
+
+#nav-bar .algo-sub-menu li 
+{
+  min-width: 180px;
+}
+#nav-bar .algo-selected
+{
+  min-width: 180px;
 }
 
 .btn
@@ -150,7 +179,7 @@ table {
 
   #main
   {
-    margin-top: 60px;
+    margin-top: 40px;
     position: relative;
     z-index: 0;
   }
@@ -180,32 +209,7 @@ table {
     overflow: hidden;
   
     order: 1;
-  }
-  
-  .selected {
-    /* background: #2f4031; */
-    /* border-radius: 8px; */
-    /* margin-bottom: 8px; */
-    color: #f5f6fa;
-    position: relative;
-  
-    order: 0;
-  }
-  
-  .selected::after {
-    content: "";
-    background-size: contain;
-    background-repeat: no-repeat;
-    /* background-color: black; */
-  
-    position: absolute;
-    height: 100%;
-    width: 22px;
-    right: 0px;
-    top: 5px;
-  
-    transition: all 0.4s;
-  }
+  }  
   
   .select-box .options-container.active {
     max-height: 240px;

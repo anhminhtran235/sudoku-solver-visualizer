@@ -2,21 +2,6 @@
 // Dropdown menu (Speed)
 // Dropdown menu (Speed)
 
-// const selected = document.querySelector(".selected");
-// const optionsContainer = document.querySelector(".options-container");
-// const optionsList = document.querySelectorAll(".option");
-
-// selected.addEventListener("click", () => {
-//   optionsContainer.classList.toggle("active");
-// });
-
-// optionsList.forEach(o => {
-//   o.addEventListener("click", () => {
-//     selected.innerHTML = o.querySelector("label").innerHTML;
-//     optionsContainer.classList.remove("active");
-//   });
-// });
-
 const speedDropDown = document.querySelector("span.selected");
 const speedOptions = document.querySelectorAll('.speed-options');
 speedOptions.forEach(e => {
@@ -27,17 +12,34 @@ speedOptions.forEach(e => {
     });
 });
 
-// Dropdown menu (Speed)
-// Dropdown menu (Speed)
-// Dropdown menu (Speed)
-const subMenu = document.querySelector("#nav-bar").children[3].children[1];
-const speedButton = document.querySelector("#nav-bar").children[3].children[0];
-const liAroundDropdownMenu = document.querySelector("#nav-bar").children[3];
+// Dropdown menu (Algorithms)
+// Dropdown menu (Algorithms)
+// Dropdown menu (Algorithms)
+
+const algorithmsDropDown = document.querySelector("span.algo-selected");
+const algorithmsOptions = document.querySelectorAll('.algo-options');
+algorithmsOptions.forEach(e => {
+    e.addEventListener("click", () => {
+        let value = e.innerHTML;
+        algorithmsDropDown.innerHTML = value;
+        algorithmsSelected = value;
+    });
+});
+
+// Dropdown menu (Algorithms)
+// Dropdown menu (Algorithms)
+// Dropdown menu (Algorithms)
+
+const subMenu = document.querySelector("#nav-bar").children[4].children[1];
+const speedButton = document.querySelector("#nav-bar").children[4].children[0];
+const liAroundDropdownMenu = document.querySelector("#nav-bar").children[4];
+const liAroundAlgoDropdownMenu = document.querySelector("#nav-bar").children[5];
 const solve = document.querySelector("#solve");
 const clear = document.querySelector("#clear");
 const randomlyFill = document.querySelector("#randomly-fill");
 const grid = document.querySelector("#grid");
 let speedSelected = "fast";
+let algorithmsSelected = "Backtracking";
 
 solve.addEventListener('click', clickedSolve);
 clear.addEventListener('click', clickedClear);
@@ -85,7 +87,7 @@ function fill80Succeed20NotSure()
 
 function mixSudokuQuiz(matrix)
 {
-    let numEntries = 30;
+    let numEntries = 23 + (Math.random() * 5);
     mixRowsAndColumns(matrix);
     keepSomeEntries(matrix, numEntries);
 
@@ -207,7 +209,6 @@ function clickedClear(e)
 }
 
 // This function is called when we click the "Solve" button
-var timeAfterAllDone = 0;
 function clickedSolve(e)
 {
     // Verify input first
@@ -215,12 +216,26 @@ function clickedSolve(e)
         return;
 
     if(speedDropDown.innerHTML === "Speed") // If haven't set speed
-    {
         speedDropDown.innerHTML = "Medium"; // Set to medium
-    }
+
+    if(algorithmsDropDown.innerHTML === "Algorithms") // If haven't set Algorithms yet
+        algorithmsDropDown.innerHTML = "Backtracking"; // Set to Backtracking
+    
+    currentAlgo = getCurrentAlgorithm();
+    if(currentAlgo === "Backtracking")
+        clickedSolveBacktracking(e);
+    else if(currentAlgo === "BFS")
+        clickedSolveBFS(e);
+}
+
+var timeAfterAllDone = 0;
+function clickedSolveBacktracking(e)
+{
     setNotAllowSolveAndSpeed();
-    matrix = readValue();
+    let matrix = readValue();
+    
     solveSudoku(matrix);
+
     timeAfterAllDone = (++timeCount) * duration;
 
     if(allBoardNonZero(matrix))
@@ -231,6 +246,35 @@ function clickedSolve(e)
     {
         timeOutID = setTimeout(alertNoSolution, timeAfterAllDone);
         timeOutID = setTimeout(setAllowSolveAndSpeed, timeAfterAllDone);
+    }
+}
+
+var bfsTimeAfterAllDone = 0;
+function clickedSolveBFS(e)
+{
+    setNotAllowSolveAndSpeed();
+    let matrix = readValue();
+
+    if(stopFromStart(matrix))   // If input is clearly unsolvable 
+    {
+        timeOutID = setTimeout(alertNoSolution, timeAfterAllDone);
+        timeOutID = setTimeout(setAllowSolveAndSpeed, timeAfterAllDone);
+        return;                 // Alert no solution right away
+    }
+
+    solveSudokuBFS(matrix);
+
+    bfsTimeAfterAllDone = (++bfsTimeCount) * bfsDuration;
+    
+    if(allBoardNonZero(matrix))
+    {
+        bfsSolveSucceededAnimation();
+    }
+    else
+    {
+        // TODO
+        timeOutID = setTimeout(alertNoSolution, bfsTimeAfterAllDone);
+        timeOutID = setTimeout(setAllowSolveAndSpeed, bfsTimeAfterAllDone);
     }
 }
 
@@ -272,7 +316,22 @@ function solveSucceededAnimation()
         }
     }
     timeOutID = setTimeout(setAllowSolveAndSpeed, currentDuration + (newCount++)*succeededDuration);
+}
 
+function bfsSolveSucceededAnimation()
+{
+    let currentDuration = bfsTimeCount * bfsDuration;
+    let succeededDuration = 20;
+    let newCount = 0;
+    for(let row = 0; row < 9; row++)
+    {
+        for(let col = 0; col < 9; col++)
+        {
+            bfstimeOutID = setTimeout(colorCell, 
+                        currentDuration + (newCount++)*succeededDuration, row, col);
+        }
+    }
+    timeOutID = setTimeout(setAllowSolveAndSpeed, currentDuration + (newCount++)*succeededDuration);
 }
 
 // Read value to 2d array
@@ -299,12 +358,12 @@ function readValue()
     return matrix;
 }
 
+// Set speed
+const FAST_SPEED = 1;
+const MEDIUM_SPEED = 10;
+const SLOW_SPEED = 50;
 function solveSudoku(matrix)
 {
-    // Set speed
-    const FAST_SPEED = 1;
-    const MEDIUM_SPEED = 10;
-    const SLOW_SPEED = 50;
     duration = MEDIUM_SPEED;
     if(speedDropDown.innerHTML === 'Fast') duration = FAST_SPEED;
     else if(speedDropDown.innerHTML === 'Medium') duration = MEDIUM_SPEED;
@@ -488,13 +547,186 @@ function setNotAllowSolveAndSpeed()
     solve.removeEventListener('click', clickedSolve);
 
     liAroundDropdownMenu.setAttribute("style", "pointer-events: none");
+    liAroundAlgoDropdownMenu.setAttribute("style", "pointer-events: none");
+
 }
 
 function setAllowSolveAndSpeed()
 {
     solve.setAttribute("style", "cursor: pointer");
+
     solve.addEventListener('click', clickedSolve);
 
     liAroundDropdownMenu.setAttribute("style", "cursor: pointer"); // enable dropdown (pointerEvent)
+    liAroundAlgoDropdownMenu.setAttribute("style", "cursor: pointer"); // enable dropdown (pointerEvent)
 
 }
+
+function getCurrentAlgorithm()
+{
+    let currentAlgo = "Backtracking";
+    if(algorithmsDropDown.html === "Backtracking") currentAlgo = "Backtracking";
+    else if(algorithmsDropDown.innerHTML === "Best First Search") currentAlgo = "BFS";
+
+    return currentAlgo;
+}
+
+
+// BEST FIRST SEARCH
+// BEST FIRST SEARCH
+// BEST FIRST SEARCH
+
+class EntryData
+{
+    constructor(row, col, choices)
+    {
+        this.row = row;
+        this.col = col;
+        this.choices = choices;
+    }
+    toString()
+    {
+        return "EntryData object, row: " + this.row + ", col: " + this.col + ", choices: " + this.choices;
+    }
+    setData(row, col, choices)
+    {
+        this.row = row;
+        this.col = col;
+        this.choices = choices;
+    }
+}
+
+var bfsCont = true;
+var bfsDuration = 1;
+var bfsTimeCount = 0;
+var bfsTimeOutID = 0;
+function solveSudokuBFS(matrix)
+{
+    bfsCont = true;
+
+    bfsDuration = MEDIUM_SPEED;
+    if(speedDropDown.innerHTML === 'Fast') bfsDuration = FAST_SPEED;
+    else if(speedDropDown.innerHTML === 'Medium') bfsDuration = MEDIUM_SPEED;
+    else if(speedDropDown.innerHTML === 'Slow') bfsDuration = SLOW_SPEED;
+
+    bfsTimeCount = 0;
+
+    solveSudokuBFSHelper(matrix);
+}
+
+function solveSudokuBFSHelper(matrix)
+{
+    if(!bfsCont)
+        return;
+    let bestCandidate = new EntryData(-1,-1, 100);
+    for(let i = 0; i < 9; i++)
+    {
+        for(let j = 0; j < 9; j++)
+        {
+            if(matrix[i][j] === 0)  // If it is empty
+            {
+                let numChoices = countChoices(matrix, i, j);
+                if(bestCandidate.choices > numChoices)
+                {
+                    bestCandidate.setData(i, j, numChoices);
+                }
+            }
+        }
+    }
+
+    if(bestCandidate.choices === 100)   // Has fill all board
+    {
+        bfsCont = false;
+        return;
+    }
+   
+    let row = bestCandidate.row;
+    let col = bestCandidate.col;
+    for(let j = 1; j <= 9; j++)
+    {
+        if(!bfsCont)
+            return;
+
+        matrix[row][col] = j;
+
+        bfsTimeOutID = setTimeout(fillCell, (bfsTimeCount++)*bfsDuration, row, col, j);
+
+        if(canBeCorrect(matrix, row, col))
+        {
+            solveSudokuBFSHelper(matrix);
+        }
+    }
+    if(!bfsCont)
+        return;
+    matrix[row][col] = 0;
+    timeOutID = setTimeout(emptyCell, (bfsTimeCount++)*bfsDuration, row, col);
+}
+
+function countChoices(matrix, i , j)
+{
+    let canPick = [true,true,true,true,true,true,true,true,true,true]; // From 0 to 9 - drop 0
+    
+    // Check row
+    for(let k = 0; k < 9; k++)
+    {
+        canPick[matrix[i][k]] = false;
+    }
+
+    // Check col
+    for(let k = 0; k < 9; k++)
+    {
+        canPick[matrix[k][j]] = false;
+    }
+
+    // Check 3x3 square
+    let r = Math.floor(i / 3);
+    let c = Math.floor(j / 3);
+    for(let row = r*3; row < r*3+3; row++)
+    {
+        for(let col = c*3; col < c*3+3; col++)
+        {
+            canPick[matrix[row][col]] = false;
+        }
+    }
+
+    // Count
+    let count = 0;
+    for(let k = 1; k <= 9; k++)
+    {
+        if(canPick[k])
+            count++;
+    }
+
+    return count;
+}
+
+function displayBoard(matrix)
+{
+    for(let i = 0; i < 9; i++)
+    {
+        for(let j = 0; j < 9; j++)
+        {
+            if(matrix[i][j] == 0)
+                grid.rows[i].cells[j].firstChild.value = "";
+            else
+                grid.rows[i].cells[j].firstChild.value = matrix[i][j];
+        }
+    }
+}
+
+function stopFromStart(matrix)
+{
+    for(let i = 0; i < 9; i++)
+    {
+        for(let j = 0; j < 9; j++)
+        {
+            if(!canBeCorrect(matrix, i, j)) // If one entry cannot be correct right from the start
+                return true;                // Stop solving
+        }
+    }
+    return false;
+}
+
+// BEST FIRST SEARCH DONE
+// BEST FIRST SEARCH DONE
+// BEST FIRST SEARCH DONE
