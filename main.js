@@ -231,6 +231,7 @@ function clickedSolve(e)
 var timeAfterAllDone = 0;
 function clickedSolveBacktracking(e)
 {
+    countToPreventHanging = 0;
     setNotAllowSolveAndSpeed();
     let matrix = readValue();
     
@@ -362,6 +363,7 @@ function readValue()
 const FAST_SPEED = 1;
 const MEDIUM_SPEED = 10;
 const SLOW_SPEED = 50;
+var countToPreventHanging = 0;
 function solveSudoku(matrix)
 {
     duration = MEDIUM_SPEED;
@@ -399,7 +401,15 @@ function solveSudokuHelper(matrix, isFixed, row, col, data)
 {
     if(data.cont === false || !canBeCorrect(matrix, row, col))
         return;
-    
+
+    countToPreventHanging++;
+    if(countToPreventHanging > 100000)
+    {
+        data.cont = false;
+        stopSolveSudokuBacktracking();
+        return;
+    }
+
     if(row === 8 && col === 8)
     {
         if(isFixed[row][col])
@@ -453,6 +463,12 @@ function solveSudokuHelper(matrix, isFixed, row, col, data)
         timeOutID = setTimeout(emptyCell, (timeCount++)*duration, row, col);
         matrix[row][col] = 0;
     }
+}
+
+function stopSolveSudokuBacktracking()
+{
+    alert("Backtracking is a Naive Algorithm. This is taking too long due to exponential search. The program will terminate to prevent hanging.");
+    clickedClear();
 }
 
 function emptyCell(row, col)
