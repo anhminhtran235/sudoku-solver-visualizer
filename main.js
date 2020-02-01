@@ -87,7 +87,7 @@ function fill80Succeed20NotSure()
 
 function mixSudokuQuiz(matrix)
 {
-    let numEntries = 23 + (Math.random() * 5);
+    let numEntries = 20 + Math.floor((Math.random() * 8));
     mixRowsAndColumns(matrix);
     keepSomeEntries(matrix, numEntries);
 
@@ -163,8 +163,8 @@ function swapCol(matrix, col1, col2)
 
 function generateRandomBoard()
 {
+    let numFill = 20 + Math.floor((Math.random() * 8));
     let matrix = new Array(9);
-    let numFill = 30;
 
     for(let i = 0; i < 9; i++)
     {
