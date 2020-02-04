@@ -1,3 +1,4 @@
+/* START General style */
 *
 {
     padding: 0px;
@@ -6,102 +7,17 @@
 
 input
 {
-  color: rgb(102, 102, 102);
+    color: rgb(102, 102, 102);
 }
 
 .cell input.active
 {
-  border-color: rgb(141, 177, 255);
+    border-color: rgb(141, 177, 255);
 }
 
 .cell input.succeeded
 {
-  border-color: rgb(120, 255, 0);
-}
-
-body
-{
-    background-image: url('background3.png');
-    background-size: 100%;
-    font-family: Arial, Helvetica, sans-serif;
-}
-
-#nav-bar
-{
-    background-color: rgb(49, 155, 255);
-    text-align: center;
-    opacity: 0.9;
-    z-index: 2;
-    position: relative;
-}
-
-#nav-bar li {
-  position: relative;
-  color: #fff;
-  padding: 15px 20px;
-  display: inline-block;
-  min-width: 80px;     
-  font-size: 20px;
-  font-weight: bold;
-}
-
-#nav-bar li:nth-child(6)
-{
-  min-width: 180px;
-}
-
-#nav-bar li:hover {
-  background-color: rgb(0, 81, 255);
-  cursor: pointer;
-}
- 
-#nav-bar li:hover .sub-menu{
-  display: block;
-}
-
-#nav-bar li:hover .algo-sub-menu{
-  display: block;
-}
-
-#nav-bar h2
-{
-  /* color: rgb(0, 255, 191); */
-  color: rgb(0, 255, 0);
-  font-style: italic;
-  padding: 10px;
-  font-size: 25px;
-}
-
-.sub-menu {
-  position: absolute;
-  left: 0;
-  top: 53px;
-  background-color: rgb(49, 155, 255);
-  display: none;
-  text-align: left;
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.algo-sub-menu {
-  position: absolute;
-  left: 0;
-  top: 53px;
-  background-color: rgb(49, 155, 255);
-  display: none;
-  text-align: left;
-  font-size: 20px;
-  font-weight: bold;
-  min-width: 180px;
-}
-
-#nav-bar .algo-sub-menu li 
-{
-  min-width: 180px;
-}
-#nav-bar .algo-selected
-{
-  min-width: 180px;
+    border-color: rgb(120, 255, 0);
 }
 
 .btn
@@ -117,11 +33,6 @@ body
     cursor: pointer;
 }
 
-/* #nav-bar li
-{
-    display: inline;
-} */
-
 .btn:hover
 {
     background-color: rgb(0, 81, 255);
@@ -131,10 +42,127 @@ body
 
 .btn:active
 {
-  background-color: rgb(0, 81, 205);
+    background-color: rgb(0, 81, 205);
 }
 
-#grid {
+
+body
+{
+    background-image: url('background3.png');
+    background-size: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+}
+/* END General style */
+
+
+
+/* START Menu style */
+/* START Menu-style.General Style */
+#nav-bar
+{
+    background-color: rgb(49, 155, 255);
+    text-align: center;
+    opacity: 0.9;
+    z-index: 2;
+    position: relative;
+}
+
+#nav-bar li 
+{
+    position: relative;
+    color: #fff;
+    padding: 15px 20px;
+    display: inline-block;
+    min-width: 80px;     
+    font-size: 20px;
+    font-weight: bold;
+}
+/* END Menu-style.General Style */
+
+/* START Menu-Style.heading "Sudoku Solver Visualizer"*/
+#nav-bar h2
+{
+    color: rgb(0, 255, 0);
+    font-style: italic;
+    padding: 10px;
+    font-size: 25px;
+}
+/* END Menu-Style.heading "Sudoku Solver Visualizer"*/
+
+/* START Menu-Style.Speed Dropdown */
+#nav-bar li:hover 
+{
+    background-color: rgb(0, 81, 255);
+    cursor: pointer;
+}
+ 
+#nav-bar li:hover .sub-menu
+{
+    display: block;
+}
+
+.sub-menu
+{
+    position: absolute;
+    left: 0;
+    top: 53px;
+    background-color: rgb(49, 155, 255);
+    display: none;
+    text-align: left;
+    font-size: 20px;
+    font-weight: bold;
+}
+/* END Menu-Style.Speed Dropdown */
+
+/* START Menu-Style.Algorithms dropdown */
+#nav-bar li:nth-child(6) 
+{
+    min-width: 180px;
+}
+
+#nav-bar li:hover .algo-sub-menu
+{
+    display: block;
+}
+
+.algo-sub-menu 
+{
+    position: absolute;
+    left: 0;
+    top: 53px;
+    background-color: rgb(49, 155, 255);
+    display: none;
+    text-align: left;
+    font-size: 20px;
+    font-weight: bold;
+    min-width: 180px;
+}
+
+#nav-bar .algo-sub-menu li 
+{
+    min-width: 180px;
+}
+#nav-bar .algo-selected
+{
+    min-width: 180px;
+}
+/* END Menu-Style.Algorithms dropdown */
+
+
+
+/* START main div style */
+/* START main-div.General Style */
+#main
+{
+    margin-top: 40px;
+    position: relative;
+    z-index: 0;
+}
+/* END main-div.General Style */
+
+/* START main-div.Table style */
+#grid 
+{
     margin: auto;
     border-collapse: collapse;
     width: 378px;
@@ -142,8 +170,41 @@ body
     border: 3px solid rgb(0, 255, 255);
 }
 
-.cell input {
+table 
+{
+    margin:1em auto;
+}
 
+td 
+{
+    height:30px;
+    width:30px;
+    border:1px solid rgb(155, 155, 255);
+    text-align:center;
+}
+
+td:first-child 
+{
+    border-left:solid rgb(155, 155, 255);
+}
+
+td:nth-child(3n) 
+{
+    border-right:solid rgb(155, 155, 255) ;
+}
+
+tr:first-child 
+{
+    border-top:solid rgb(155, 155, 255);
+}
+
+tr:nth-child(3n) td 
+{
+    border-bottom:solid rgb(155, 155, 255);
+}
+
+.cell input 
+{
     opacity: 0.9;
     display: inline-block;
 
@@ -154,104 +215,4 @@ body
     text-align: center;
     font-size: 30px;
 }
-
-table {
-    margin:1em auto;
-  }
-  td {
-    height:30px;
-    width:30px;
-    border:1px solid rgb(155, 155, 255);
-    text-align:center;
-  }
-  td:first-child {
-    border-left:solid rgb(155, 155, 255);
-  }
-  td:nth-child(3n) {
-    border-right:solid rgb(155, 155, 255) ;
-  }
-  tr:first-child {
-    border-top:solid rgb(155, 155, 255);
-  }
-  tr:nth-child(3n) td {
-    border-bottom:solid rgb(155, 155, 255);
-  }
-
-  #main
-  {
-    margin-top: 40px;
-    position: relative;
-    z-index: 0;
-  }
-
-
-
-  /* Drop down menu */
-  /* Drop down menu */
-  /* Drop down menu */
-
-
-  .select-box {
-    display: flex;
-    width: 100px;
-    flex-direction: column;
-  }
-  
-  .select-box .options-container {
-    /* background: #2f3640; */
-    background: rgb(49, 155, 255);
-    color: #f5f6fa;
-    max-height: 0;
-    width: 100%;
-    opacity: 0;
-    transition: all 0.4s;
-    border-radius: 8px;
-    overflow: hidden;
-  
-    order: 1;
-  }  
-  
-  .select-box .options-container.active {
-    max-height: 240px;
-    opacity: 1;
-    /* overflow-y: scroll; */
-  }
-  
-  .select-box .options-container.active + .selected::after {
-    transform: rotateX(180deg);
-    top: -6px;
-  }
-  
-  /* .select-box .options-container::-webkit-scrollbar {
-    width: 8px;
-    background: #ff0022;
-    border-radius: 0 8px 8px 0;
-  } */
-  
-  /* .select-box .options-container::-webkit-scrollbar-thumb {
-    background: #525861;
-    border-radius: 0 8px 8px 0;
-  }  */
-  
-  .select-box .option,
-  .selected {
-    /* padding: 12px 24px; */
-    cursor: pointer;
-  }
-  
-  .select-box .option:hover {
-    /* background: #574144; */
-    background: rgb(0, 81, 255);
-  }
-  
-  .select-box label {
-    cursor: pointer;
-  }
-  
-  .select-box .option .radio {
-    display: none;
-  }
-
-  /* Drop down menu */
-  /* Drop down menu */
-  /* Drop down menu */
+/* END main-div.Table style */
