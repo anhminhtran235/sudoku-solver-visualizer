@@ -48,8 +48,12 @@ input
 
 body
 {
-    background-image: url('background3.png');
-    background-size: 100%;
+    background: url('background.png') no-repeat fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+
     font-family: Arial, Helvetica, sans-serif;
 }
 /* END General style */
