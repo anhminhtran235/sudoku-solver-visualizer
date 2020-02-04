@@ -4,17 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Sudoku Solver</title>
+    <title>Sudoku Solver Visualizer</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <nav id="nav-bar">
-        <li><button class="btn" id="clear">Clear</button>
-        <li><button class="btn" id="solve">Solve</button>
-        <li><button class="btn" id="randomly-fill">Randomly fill</button>
-    </nav>
+        <h2>Sudoku Solver Visualizer</h2>
+        <li id="clear"><span>Clear</span>
+        <li id="randomly-fill"><span>Randomly Fill</span>
+        <li id="solve"><span>Solve</span>
+        
+        <li>
+            <span class="selected">Speed</span>
+            <ul class="sub-menu">
+            <li class="speed-options">Fast</li>
+            <li class="speed-options">Medium</li>
+            <li class="speed-options">Slow</li>
+            </ul>
+        </li>
 
+        <li>
+            <span class="algo-selected">Algorithms</span>
+            <ul class="algo-sub-menu">
+            <li class="algo-options">Backtracking</li>
+            <li class="algo-options">Best First Search</li>
+            </ul>
+        </li>
+    </nav>
 
     <div id="main">
         <table id="grid">
@@ -27,7 +44,7 @@
                 <td class="cell"><input type="text" maxlength="1"></td>
                 <td class="cell"><input type="text" maxlength="1"></td>
                 <td class="cell"><input type="text" maxlength="1"></td>
-                <td  class="cell"><input type="text" maxlength="1"></td  >
+                <td  class="cell"><input type="text" maxlength="1"></td >
 
                 <!--row--></tr>
             
@@ -127,6 +144,5 @@
         </table>
     </div>
     <script src="main.js"></script>
-
 </body>
 </html>

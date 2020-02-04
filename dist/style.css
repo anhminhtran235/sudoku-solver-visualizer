@@ -1,36 +1,29 @@
+/* START General style */
 *
 {
     padding: 0px;
     margin: 0px;
-    
 }
 
 input
 {
-  color: rgb(102, 102, 102);
+    color: rgb(102, 102, 102);
 }
 
-body
+.cell input.active
 {
-    background-image: url('background3.png');
-    background-size: 100%;
-  
+    border-color: rgb(141, 177, 255);
 }
 
-#nav-bar
+.cell input.succeeded
 {
-    background-color: rgb(49, 155, 255);
-    text-align: center;
-    opacity: 0.9;
+    border-color: rgb(120, 255, 0);
 }
-
-
 
 .btn
 {
     border: none;
     box-sizing: border-box;
-    font-family: Arial, Helvetica, sans-serif;
     display: inline-block;
     padding: 15px 20px;
     text-decoration: none;
@@ -38,11 +31,6 @@ body
     background-color: rgb(49, 155, 255);
     font-size: 20px;
     cursor: pointer;
-}
-
-#nav-bar li
-{
-    display: inline;
 }
 
 .btn:hover
@@ -54,10 +42,127 @@ body
 
 .btn:active
 {
-  background-color: rgb(0, 81, 205);
+    background-color: rgb(0, 81, 205);
 }
 
-#grid {
+
+body
+{
+    background-image: url('background3.png');
+    background-size: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+}
+/* END General style */
+
+
+
+/* START Menu style */
+/* START Menu-style.General Style */
+#nav-bar
+{
+    background-color: rgb(49, 155, 255);
+    text-align: center;
+    opacity: 0.9;
+    z-index: 2;
+    position: relative;
+}
+
+#nav-bar li 
+{
+    position: relative;
+    color: #fff;
+    padding: 15px 20px;
+    display: inline-block;
+    min-width: 80px;     
+    font-size: 20px;
+    font-weight: bold;
+}
+/* END Menu-style.General Style */
+
+/* START Menu-Style.heading "Sudoku Solver Visualizer"*/
+#nav-bar h2
+{
+    color: rgb(0, 255, 0);
+    font-style: italic;
+    padding: 10px;
+    font-size: 25px;
+}
+/* END Menu-Style.heading "Sudoku Solver Visualizer"*/
+
+/* START Menu-Style.Speed Dropdown */
+#nav-bar li:hover 
+{
+    background-color: rgb(0, 81, 255);
+    cursor: pointer;
+}
+ 
+#nav-bar li:hover .sub-menu
+{
+    display: block;
+}
+
+.sub-menu
+{
+    position: absolute;
+    left: 0;
+    top: 53px;
+    background-color: rgb(49, 155, 255);
+    display: none;
+    text-align: left;
+    font-size: 20px;
+    font-weight: bold;
+}
+/* END Menu-Style.Speed Dropdown */
+
+/* START Menu-Style.Algorithms dropdown */
+#nav-bar li:nth-child(6) 
+{
+    min-width: 180px;
+}
+
+#nav-bar li:hover .algo-sub-menu
+{
+    display: block;
+}
+
+.algo-sub-menu 
+{
+    position: absolute;
+    left: 0;
+    top: 53px;
+    background-color: rgb(49, 155, 255);
+    display: none;
+    text-align: left;
+    font-size: 20px;
+    font-weight: bold;
+    min-width: 180px;
+}
+
+#nav-bar .algo-sub-menu li 
+{
+    min-width: 180px;
+}
+#nav-bar .algo-selected
+{
+    min-width: 180px;
+}
+/* END Menu-Style.Algorithms dropdown */
+
+
+
+/* START main div style */
+/* START main-div.General Style */
+#main
+{
+    margin-top: 40px;
+    position: relative;
+    z-index: 0;
+}
+/* END main-div.General Style */
+
+/* START main-div.Table style */
+#grid 
+{
     margin: auto;
     border-collapse: collapse;
     width: 378px;
@@ -65,9 +170,42 @@ body
     border: 3px solid rgb(0, 255, 255);
 }
 
-.cell input {
+table 
+{
+    margin:1em auto;
+}
 
-  opacity: 0.9;
+td 
+{
+    height:30px;
+    width:30px;
+    border:1px solid rgb(155, 155, 255);
+    text-align:center;
+}
+
+td:first-child 
+{
+    border-left:solid rgb(155, 155, 255);
+}
+
+td:nth-child(3n) 
+{
+    border-right:solid rgb(155, 155, 255) ;
+}
+
+tr:first-child 
+{
+    border-top:solid rgb(155, 155, 255);
+}
+
+tr:nth-child(3n) td 
+{
+    border-bottom:solid rgb(155, 155, 255);
+}
+
+.cell input 
+{
+    opacity: 0.9;
     display: inline-block;
 
     border: 5px solid rgb(0, 255, 255);
@@ -77,36 +215,4 @@ body
     text-align: center;
     font-size: 30px;
 }
-
-table {
-    margin:1em auto;
-  }
-  td {
-    height:30px;
-    width:30px;
-    border:1px solid rgb(155, 155, 255);
-    text-align:center;
-  }
-  td:first-child {
-    border-left:solid rgb(155, 155, 255);
-  }
-  td:nth-child(3n) {
-    border-right:solid rgb(155, 155, 255) ;
-  }
-  tr:first-child {
-    border-top:solid rgb(155, 155, 255);
-  }
-  tr:nth-child(3n) td {
-    border-bottom:solid rgb(155, 155, 255);
-  }
-
-  #main
-  {
-    margin-top: 60px;
-  }
-
-  .result
-  {
-    font-size: 30px;
-    color:red;
-  }
+/* END main-div.Table style */
