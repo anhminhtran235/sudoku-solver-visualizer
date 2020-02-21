@@ -275,6 +275,8 @@ function clickedSolve(e)
         solveByBacktracking(e);
     else if(currentAlgo === "BFS")
         solveByBFS(e);
+    else if(currentAlgo === "Dancing Links")
+        solveByDancingLinks(e);
 }
 
 //------------------------------------------------START Backtracking-------------------------------------------------
@@ -292,7 +294,7 @@ function solveByBacktracking(e)
 
     if(allBoardNonZero(matrix))             // If We actually have a solution
     {
-        backtrackingSucceededAnimation(backtrackingTimeCount, backtrackingDuration);
+        succeededNormalAnimation(backtrackingTimeCount, backtrackingDuration);
     }
     else
     {
@@ -368,7 +370,7 @@ function backtrackingHelper(matrix, isFixed, row, col, data)
             for(let i = 1; i <= 9; i++) 
             {
                 matrix[row][col] = i; // Try 1-9
-                timeOutIDSameForAnyAnimation = setTimeout(fillCell, (backtrackingTimeCount++)*backtrackingDuration, row, col, i);
+                timeOutIDSameForAnyAnimation = setTimeout(fillCell, (backtrackingTimeCount++)*backtrackingDuration, row, col, i); // SEE HERE
                 if(canBeCorrect(matrix, row, col)) // If found the solution
                 {
                     data.cont = false;
@@ -419,8 +421,8 @@ function stopSolveSudokuBacktracking()
     clickedClear();
 }
 
-// Animation when we have found the solution using backtracking
-function backtrackingSucceededAnimation(currentTimeCount, currentDuration)
+// Normal animation when we have found the solution 
+function succeededNormalAnimation(currentTimeCount, currentDuration)
 {
     let currentTime = currentTimeCount * currentDuration;
     let succeededDuration = 20;
@@ -483,7 +485,7 @@ function solveByBFS(e)
     
     if(allBoardNonZero(matrix))
     {
-        bfsSolveSucceededAnimation();
+        succeededNormalAnimation(bfsTimeCount, bfsDuration);
     }
     else
     {
@@ -563,23 +565,6 @@ function solveSudokuBFSHelper(matrix)
     timeOutIDSameForAnyAnimation = setTimeout(emptyCell, (bfsTimeCount++)*bfsDuration, row, col);
 }
 
-// Animation when we have successfully solved by Best-First Search
-function bfsSolveSucceededAnimation()
-{
-    let currentDuration = bfsTimeCount * bfsDuration;
-    let succeededDuration = 20;
-    let newCount = 0;
-    for(let row = 0; row < 9; row++)
-    {
-        for(let col = 0; col < 9; col++)
-        {
-            timeOutIDSameForAnyAnimation = setTimeout(colorCell, 
-                        currentDuration + (newCount++)*succeededDuration, row, col);
-        }
-    }
-    timeOutIDSameForAnyAnimation = setTimeout(setAllowSolveSpeedAndAlgorithms, currentDuration + (newCount++)*succeededDuration);
-}
-
 // Count possibilities for an entry
 function countChoices(matrix, i , j)
 {
@@ -635,6 +620,394 @@ function noSolutionFromStart(matrix)
 //----------------------------------------------END Best-First Search------------------------------------------------
 //----------------------------------------------END Best-First Search------------------------------------------------
 //----------------------------------------------END Best-First Search------------------------------------------------
+
+//--------------------------------------------START Dancing Links----------------------------------------------
+//--------------------------------------------START Dancing Links----------------------------------------------
+//--------------------------------------------START Dancing Links----------------------------------------------
+
+class DLHeaderNode
+{
+    constructor(up, down, left, right, size)
+    {
+        this.up = up;
+        this.down = down;
+        this.left = left;
+        this.right = right;
+        this.size = size;
+    }
+}
+
+class DLNode
+{
+    constructor(up, down, left, right, header, rowNumber)
+    {
+        this.up = up;
+        this.down = down;
+        this.left = left;
+        this.right = right;
+        this.header = header;
+        this.rowNumber = rowNumber;
+    }
+}
+
+function solveByDancingLinks(e)
+{
+    setNotAllowSolveSpeedAndAlgorithms();   // Disable some buttons
+    let matrix = readValue();               // Read values from web board
+
+    dancingLinks(matrix);
+
+    let timeAfterAllDone = (++DancingLinksTimeCount) * DancingLinksDuration;
+
+    if(allBoardNonZero(matrix))             // If We actually have a solution
+    {
+        succeededNormalAnimation(DancingLinksTimeCount, DancingLinksDuration);
+    }
+    else
+    {
+        timeOutIDSameForAnyAnimation = setTimeout(alertNoSolution, timeAfterAllDone);
+        timeOutIDSameForAnyAnimation = setTimeout(setAllowSolveSpeedAndAlgorithms, timeAfterAllDone);
+    }
+}
+
+var DancingLinksTimeCount = 0;
+var DancingLinksDuration = 0;
+function dancingLinks(matrix)
+{
+    // Init for animation
+
+    // Setting Speed
+    DancingLinksDuration = MEDIUM_SPEED;
+    if(speedDropDown.innerHTML === 'Fast') DancingLinksDuration = FAST_SPEED;
+    else if(speedDropDown.innerHTML === 'Medium') DancingLinksDuration = MEDIUM_SPEED;
+    else if(speedDropDown.innerHTML === 'Slow') DancingLinksDuration = SLOW_SPEED;
+ 
+    DancingLinksTimeCount = 0;  // Time count for scheduling animation
+
+
+    /* Initialize the whole doubly-linkedlist board */
+    /* Initialize the whole doubly-linkedlist board */
+    /* Initialize the whole doubly-linkedlist board */
+
+    let numRows = 729;
+    let numCols = 324;
+    let masterNode = new DLHeaderNode(null, null, null, null, -1);
+    let topColumnNodeList = []; // For easy access to topColumnNode (When init board only)
+    let topRowNodeList = []; // For easy access to topRowNode (When using prefilled number from sudoku board)
+    
+    // Set up 324 columns, each column only has a top node 
+    let prevCol = masterNode;
+    for(let c = 0; c < numCols; c++)        // 324 columns
+    {
+        // Top node at each column. Initially, we'll have 0 nodes under each column.
+        let currentCol = new DLHeaderNode(null, null, prevCol, null, 0);    
+        topColumnNodeList.push(currentCol);     // Add it to the list
+        prevCol.right = currentCol;
+        prevCol = currentCol;
+    }
+    // Circular linkedlist
+    topColumnNodeList[topColumnNodeList.length-1].right = masterNode;   
+    masterNode.left = topColumnNodeList[topColumnNodeList.length-1];
+
+    // Right now we have the "skeleton" of our linkedlist board: 1 master node connecting to a list of top nodes
+
+    // Now iterating through each rows (729 in total), create 4 nodes in each rows and connect them in the right way
+    for(let i = 0; i < numRows; i++)
+    {
+        // Row 1: 1 at (0,0), Row 2: 2 at (0,0), Row 3: 3 at (0,0),... Row 9: 9 at (0,0)
+        // Row 10: 1 at (0,1), ... Row 80: 9 at (0,8), Row 81: 1 at (1,0)
+        
+        // You can write a simple program to print out all row, col and number with its corressponing i to double-check
+        let r = Math.floor(i / 81); // Note that i starts from 0, so i = 80 when Row = 81
+        let c = Math.floor((i % 81) / 9); 
+        let num = i % 9 + 1;
+
+        // We have 324 columns
+        // Columns (Constraints) 0-80: We must have a number in every entry
+        // Columns 81-161: We must have 1-9 in every row
+        // Columns 162-242: We must have 1-9 in every column
+        // Columns 243-323: We must have 1-9 in every 3x3 block
+        
+        // => If we have a number "num" at row "r" and column "c", we must connect 4 Nodes together
+        // Node 1 in column 0-80, node 2 in column 81-161,...
+        let node1Index = r*9 + c;   // Have a number in entry (r,c)
+        let node2Index = 80 + 9*r + num; // Have num in row r
+        let node3Index = 161 + 9*c + num; // Have num in col c
+        let b = Math.floor(r/3) * 3 + Math.floor(c/3); // b means block
+        let node4Index = 242 + 9*b + num; // Have num in block b
+
+        // Now let's connect those nodes horizontally :))
+        let node1 = new DLNode(null, null, null, null, topColumnNodeList[node1Index], i); // Note: i is row number
+        let node2 = new DLNode(null, null, node1, null, topColumnNodeList[node2Index], i); // i starts from 0. Be careful!
+        let node3 = new DLNode(null, null, node2, null, topColumnNodeList[node3Index], i);
+        let node4 = new DLNode(null, null, node3, null, topColumnNodeList[node4Index], i);
+        node1.right = node2;
+        node2.right = node3;
+        node3.right = node4;
+
+        topRowNodeList.push(node1); // Add the first node to topRowNodeList for easy access when we start using prefilled number from Sudoku Board
+
+        // Circular linkedlist
+        node4.right = node1;
+        node1.left = node4;
+        
+        // And put them in the right columns
+        let topCol1 = topColumnNodeList[node1Index];
+        let topCol2 = topColumnNodeList[node2Index];
+        let topCol3 = topColumnNodeList[node3Index];
+        let topCol4 = topColumnNodeList[node4Index];
+
+        addNodeToBottomOfAColumn(node1, topCol1);
+        addNodeToBottomOfAColumn(node2, topCol2);
+        addNodeToBottomOfAColumn(node3, topCol3);
+        addNodeToBottomOfAColumn(node4, topCol4);
+
+        // Update topColumnNodeList.size
+        topColumnNodeList[node1Index].size++;
+        topColumnNodeList[node2Index].size++;
+        topColumnNodeList[node3Index].size++;
+        topColumnNodeList[node4Index].size++;
+    }
+    // Pheww :)) We're done setting up our linkedlist board
+
+    /* DONE Initializing the whole doubly-linkedlist board */
+    /* DONE Initializing the whole doubly-linkedlist board */
+    /* DONE Initializing the whole doubly-linkedlist board */
+    
+    
+
+    /* START using prefilled sudoku entries */
+    /* START using prefilled sudoku entries */
+    /* START using prefilled sudoku entries */
+
+    for(let i = 0; i < matrix.length; i++)
+    {
+        for(let j = 0; j < matrix[i].length; j++)
+        {
+            if(matrix[i][j] != 0)
+            {
+                let num = matrix[i][j];
+                let rowNumber = (num-1) + i*81 + j*9;   // Get row number
+
+                // Cover the whole row!
+                let headNodeFromARow = topRowNodeList[rowNumber];
+                coverColumn(headNodeFromARow.header);   // Cover the first column
+                let temp = headNodeFromARow.right;
+                while(temp != headNodeFromARow)         // Cover the rest
+                {
+                    coverColumn(temp.header);
+                    temp = temp.right;
+                }
+            }
+        }
+    }
+
+    /* END using prefilled sudoku entries */
+    /* END using prefilled sudoku entries */
+    /* END using prefilled sudoku entries */
+    
+    // Solve
+    DLCont = true;
+    DLSearch(0, masterNode, matrix);
+}
+
+var DLCont = true;
+function DLSearch(k, masterNode, matrix)
+{
+    // End 
+    if(!DLCont)
+        return;
+
+    if(masterNode.right === masterNode)
+    {
+        DLCont = false;
+        return;
+    }
+
+    // Pick a column (naively right now, will improve later)
+    // let c = masterNode.right; 
+
+    // Pick the best column (The column with the smallest size - aka possibilities)
+    let tempC = masterNode.right;
+    let c = tempC;  
+    while(tempC != masterNode)
+    {
+        if(c.size > tempC.size)
+        {
+            c = tempC;
+        }
+        tempC = tempC.right;
+    }
+    
+    coverColumn(c);
+
+    let r = c.down;
+    while(r != c)   // We're picking a row
+    {
+        
+        if(!DLCont)
+            return;
+
+        // Set the corresponing number to the corresponding row and column
+        let correspondingSudokuBoardRow = Math.floor(r.rowNumber/81);
+        let correspondingSudokuBoardColumn = Math.floor((r.rowNumber%81) / 9);
+        let correspondingSudokuBoardNumber = r.rowNumber % 9 + 1;
+        matrix[correspondingSudokuBoardRow][correspondingSudokuBoardColumn] = correspondingSudokuBoardNumber;
+
+        let row = correspondingSudokuBoardRow;
+        let col = correspondingSudokuBoardColumn;
+        let i = correspondingSudokuBoardNumber;
+        timeOutIDSameForAnyAnimation = setTimeout(fillCell, (DancingLinksTimeCount++)*DancingLinksDuration, row, col, i);
+
+        let j = r.right;
+        while(j != r)
+        {
+            coverColumn(j.header);
+            j = j.right;
+        }
+        
+        DLSearch(k+1, masterNode, matrix);
+
+        if(!DLCont)
+            return;
+
+
+        matrix[correspondingSudokuBoardRow][correspondingSudokuBoardColumn] = 0; // Backtrack
+
+        timeOutIDSameForAnyAnimation = setTimeout(emptyCell, (DancingLinksTimeCount++)*DancingLinksDuration, row, col);
+
+        j = r.left;
+        while(j != r)
+        {
+            uncoverColumn(j.header);
+            j = j.left;
+        }
+        
+        r = r.down;
+    }
+
+    uncoverColumn(c);
+}
+
+function addNodeToBottomOfAColumn(nodeToAdd, columnTop)
+{
+    let temp = columnTop;
+    while(temp.down !== null && temp.down != columnTop) // When temp reach the bottom, when column is empty, temp.down will be equal to null, when column has some element, temp.down will be equal to columnTop (Circular linkedlist)
+    {
+        temp = temp.down;
+    }
+    temp.down = nodeToAdd;
+    nodeToAdd.up = temp;
+
+    // Circular
+    nodeToAdd.down = columnTop;
+    columnTop.up = nodeToAdd;
+}
+
+function coverColumn(topColumnNode)
+{
+    // Please see Knuth's Paper for better understanding http://www-cs-faculty.stanford.edu/~uno/papers/dancing-color.ps.gz
+    // (Page 6 - Covering a column)
+
+    let c = topColumnNode; // For shorter writing
+
+    c.right.left = c.left;
+    c.left.right = c.right;
+
+    let i = c.down;
+    while(i != c)
+    {
+        let j = i.right;
+        while(j != i)
+        {
+            j.down.up = j.up;
+            j.up.down = j.down;
+
+            j.header.size--;
+
+            j = j.right;
+        }
+        i = i.down;
+    }
+}   
+
+function uncoverColumn(topColumnNode)
+{
+    // Please see Knuth's Paper for better understanding http://www-cs-faculty.stanford.edu/~uno/papers/dancing-color.ps.gz
+    // (Page 6 - Covering a column)
+
+    let c = topColumnNode; // For shorter writing
+
+    let i = c.up;
+    while(i != c)
+    {
+        let j = i.left;
+        while(j != i)
+        {
+            j.header.size++;
+
+            j.down.up = j;
+            j.up.down = j;
+
+            j = j.left;
+        }
+        i = i.up;
+    }
+    c.right.left = c;
+    c.left.right = c;
+}
+
+function succeededSpiralAnimation(currentTimeCount, currentDuration)
+{
+    let currentTime = currentTimeCount * currentDuration;
+    let succeededDuration = 20;
+    let newCount = 0;
+
+    let size = 9;
+    let row = 0;
+    let col = 0;
+
+    while(size > 0)
+    {
+        // Animation for the top row of our layer with size "size"
+        for(let j = col; j < col + size; j++)
+        {
+            timeOutIDSameForAnyAnimation = setTimeout(colorCell, 
+                                         currentTime + (newCount++)*succeededDuration, row, j);
+        }
+
+        // Animation for the last column of our layer with size "size"
+        for(let i = row + 1; i < row + size; i++)
+        {
+            timeOutIDSameForAnyAnimation = setTimeout(colorCell, 
+                                         currentTime + (newCount++)*succeededDuration, i, col+size-1);
+        }
+
+        // Animation for the last row of our layer with size "size"
+        for(let j = col + size - 2; j >= col; j--)
+        {
+            timeOutIDSameForAnyAnimation = setTimeout(colorCell, 
+                                        currentTime + (newCount++)*succeededDuration, row+size-1, j);
+        }
+
+        // Animation for the first column of our layer with size "size"
+        for(let i = row + size - 2; i >= row+1; i--)
+        {
+            timeOutIDSameForAnyAnimation = setTimeout(colorCell, 
+                                        currentTime + (newCount++)*succeededDuration, i, col);
+        }
+
+        // Update row, col and size
+        size -= 2;
+        row++;
+        col++;
+    }
+
+    timeOutIDSameForAnyAnimation = setTimeout(setAllowSolveSpeedAndAlgorithms, currentTime + (newCount++)*succeededDuration);
+}
+//--------------------------------------------END Dancing Links----------------------------------------------
+//--------------------------------------------END Dancing Links----------------------------------------------
+//--------------------------------------------END Dancing Links----------------------------------------------
 
 //-------------------------------------------------END clickedSolve--------------------------------------------------
 //-------------------------------------------------END clickedSolve--------------------------------------------------
@@ -746,6 +1119,7 @@ function getCurrentAlgorithm()
 
     if(algorithmsDropDown.html === "Backtracking") currentAlgo = "Backtracking";
     else if(algorithmsDropDown.innerHTML === "Best First Search") currentAlgo = "BFS";
+    else if(algorithmsDropDown.innerHTML === "Dancing Links") currentAlgo = "Dancing Links";
 
     return currentAlgo;
 }
