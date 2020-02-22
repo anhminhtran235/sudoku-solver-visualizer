@@ -35,6 +35,7 @@ const inputs = document.getElementsByTagName('input');
 const FAST_SPEED = 1;
 const MEDIUM_SPEED = 10;
 const SLOW_SPEED = 50;
+const EXTRA_SLOW_SPEED = 150;
 
 // Add eventListener
 clear.addEventListener('click', clickedClear);
@@ -269,10 +270,11 @@ function clickedSolve(e)
     if(algorithmsDropDown.innerHTML === "Algorithms") // If haven't set Algorithms yet
         algorithmsDropDown.innerHTML = "Backtracking"; // Set to Backtracking
     
-    currentAlgo = getCurrentAlgorithm();
+    let currentAlgo = getCurrentAlgorithm();
 
-    if(currentAlgo === "Backtracking")
-        solveByBacktracking(e);
+    // Reverse Backtracking and Spiral Backtracking are just different variation of Backtracking
+    if(currentAlgo === "Backtracking" || currentAlgo === "Reverse Backtracking" || currentAlgo === "Spiral Backtracking")
+        solveByBacktracking(e, currentAlgo);
     else if(currentAlgo === "BFS")
         solveByBFS(e);
     else if(currentAlgo === "Dancing Links")
@@ -282,19 +284,22 @@ function clickedSolve(e)
 //------------------------------------------------START Backtracking-------------------------------------------------
 //------------------------------------------------START Backtracking-------------------------------------------------
 //------------------------------------------------START Backtracking-------------------------------------------------
-function solveByBacktracking(e)
+function solveByBacktracking(e, currentAlgo)
 {
     backtrackingCountToPreventHanging = 0;
     setNotAllowSolveSpeedAndAlgorithms();   // Disable some buttons
     let matrix = readValue();               // Read values from web board
 
-    backtracking(matrix);                    // Solving sudoku
+    backtracking(matrix, currentAlgo);                    // Solving sudoku
 
     let timeAfterAllDone = (++backtrackingTimeCount) * backtrackingDuration;
 
     if(allBoardNonZero(matrix))             // If We actually have a solution
     {
-        succeededNormalAnimation(backtrackingTimeCount, backtrackingDuration);
+        if(currentAlgo === "Backtracking" || currentAlgo === "Reverse Backtracking")
+            succeededNormalAnimation(backtrackingTimeCount, backtrackingDuration);
+        else if(currentAlgo === "Spiral Backtracking")
+            succeededSpiralAnimation(backtrackingTimeCount, backtrackingDuration);
     }
     else
     {
@@ -308,13 +313,15 @@ var backtrackingCountToPreventHanging = 0;
 var backtrackingDuration = 1;
 var backtrackingTimeCount = 0;
 var timeOutIDSameForAnyAnimation = 0;
-function backtracking(matrix)
+function backtracking(matrix, currentAlgo)
 {
     // Setting Speed
     backtrackingDuration = MEDIUM_SPEED;
     if(speedDropDown.innerHTML === 'Fast') backtrackingDuration = FAST_SPEED;
     else if(speedDropDown.innerHTML === 'Medium') backtrackingDuration = MEDIUM_SPEED;
     else if(speedDropDown.innerHTML === 'Slow') backtrackingDuration = SLOW_SPEED;
+    else if(speedDropDown.innerHTML === 'Extra Slow') backtrackingDuration = EXTRA_SLOW_SPEED;
+
 
     backtrackingTimeCount = 0;  // Time count for scheduling animation
     
@@ -337,11 +344,29 @@ function backtracking(matrix)
     }
 
     let data = {cont: true};
-    backtrackingHelper(matrix, isFixed, 0, 0, data);
+    let startingRow = -1;
+    let startingCol = -1;
+    if(currentAlgo === "Backtracking")
+    {
+        startingRow = 0;
+        startingCol = 0;
+    }
+    else if(currentAlgo === "Reverse Backtracking")
+    {
+        startingRow = matrix.length - 1;
+        startingCol = matrix.length - 1;
+    }
+    else if(currentAlgo === "Spiral Backtracking")
+    {
+        startingRow = 0;
+        startingCol = 0;
+    }
+    backtrackingHelper(matrix, isFixed, startingRow, startingCol, data, currentAlgo);
 }
 
-function backtrackingHelper(matrix, isFixed, row, col, data)
+function backtrackingHelper(matrix, isFixed, row, col, data, currentAlgo)
 {
+
     // If !data.cont or having our current entry at (row, col) lead to a clearly invalid sudoku board
     if(data.cont === false || !canBeCorrect(matrix, row, col))  // 1st stopping point
         return;
@@ -351,11 +376,13 @@ function backtrackingHelper(matrix, isFixed, row, col, data)
     if(backtrackingCountToPreventHanging > 100000)  // Runs for too long without a solution
     {
         data.cont = false;  // Set the flag so that the rest of the recursive calls can stop at "stopping points"
-        stopSolveSudokuBacktracking(); // Stop the program
+        stopSolveSudokuBacktracking(currentAlgo); // Stop the program
         return;
     }
 
-    if(row === 8 && col === 8)  // If reach the last entry
+    if((currentAlgo === "Backtracking" && row === 8 && col === 8)
+        || (currentAlgo === "Reverse Backtracking" && row === 0 && col === 0)
+        || (currentAlgo === "Spiral Backtracking" && row === 4 && col === 4))  // If reach the last entry
     {
         if(isFixed[row][col])   // The last entry is user input
         {
@@ -370,10 +397,10 @@ function backtrackingHelper(matrix, isFixed, row, col, data)
             for(let i = 1; i <= 9; i++) 
             {
                 matrix[row][col] = i; // Try 1-9
-                timeOutIDSameForAnyAnimation = setTimeout(fillCell, (backtrackingTimeCount++)*backtrackingDuration, row, col, i); // SEE HERE
+                timeOutIDSameForAnyAnimation = setTimeout(fillCell, (backtrackingTimeCount++)*backtrackingDuration, row, col, i);
                 if(canBeCorrect(matrix, row, col)) // If found the solution
                 {
-                    data.cont = false;
+                    data.cont = false; 
                     return;
                 }
             }
@@ -382,14 +409,88 @@ function backtrackingHelper(matrix, isFixed, row, col, data)
         }
     }
 
-    // Fill from left to right, from top to bottom
-    let newRow = (col === 8) ? row + 1 : row;   
-    let newCol = (col === 8) ? 0 : col + 1;
+    // Compute newRow and new Column coressponding to currentAlgo
+    let newRow = -1;
+    let newCol = -1;
+    if(currentAlgo === "Backtracking")
+    {
+        // Fill from left to right, from top to bottom
+        newRow = (col === 8) ? row + 1 : row;   
+        newCol = (col === 8) ? 0 : col + 1;
+    }
+    else if(currentAlgo === "Reverse Backtracking")
+    {
+        // Fill from right to left, bottom to top
+        newRow = (col === 0) ? row - 1 : row;
+        newCol = (col === 0) ? 8 : col - 1;
+    }
+    else if(currentAlgo === "Spiral Backtracking")
+    {
+
+        // Initialize newRow to currentRow and newCol to currentColumn
+        newRow = row;
+        newCol = col;
+
+        let center = Math.floor(matrix.length / 2);
+        let size = Math.max((Math.abs(row-center)+1)*2-1, (Math.abs(col-center)+1)*2-1); // Current layer size
+        let offset = Math.floor(size / 2);
+
+        if((row === center - offset && col != center + offset)
+            || row === center - offset+1 && col == center - offset)
+        {
+            newCol = col+1; // Go right
+        }
+        else if(col === center + offset && row != center + offset)
+        {
+            newRow = row + 1; // Go down
+        }
+        else if(row === center + offset && col != center - offset)
+        {
+            newCol = col-1; // Go left
+        }
+        else if(col === center - offset && row != center - offset+1)
+        {
+            newRow = row -1; // Go up
+        }
+
+
+        // Below is inside out spiral. It's too slow :((
+        // Use this for animation :)))
+        // // Initialize to current row and column
+        // newRow = row;
+        // newCol = col;
+
+        // // Fill spiral
+        // let center = Math.floor(matrix.length / 2);
+        // let size = Math.max((Math.abs(row-center)+1)*2-1, (Math.abs(col-center)+1)*2-1); // Current layer size
+        
+        // if(row === center && col === center)    // If we're at the center
+        // {
+        //     newCol = col - 1; // Go left
+        // }
+        // else if(row === center + Math.floor(size / 2))
+        // {
+        //     newCol = col-1; // Go left
+        // }
+        // else if(col === center - Math.floor(size / 2) && row != center - Math.floor(size / 2) 
+        //         && row != center + Math.floor(size / 2))
+        // {
+        //     newRow = row - 1;   // Go up
+        // }
+        // else if(row === center - Math.floor(size / 2) && col != center + Math.floor(size / 2))
+        // {
+        //     newCol = col + 1; // Go right
+        // }
+        // else if(col === center + Math.floor(size / 2) && row != center + Math.floor(size / 2))
+        // {
+        //     newRow = row + 1;   // Go down
+        // }
+    }
     
     // If this entry is user input and is valid
     if(isFixed[row][col] && canBeCorrect(matrix, row, col))
     {
-        backtrackingHelper(matrix, isFixed, newRow, newCol, data); // Continue next entry
+        backtrackingHelper(matrix, isFixed, newRow, newCol, data, currentAlgo); // Continue next entry
     }
     // If it is empty
     else    
@@ -403,7 +504,7 @@ function backtrackingHelper(matrix, isFixed, row, col, data)
 
             if(canBeCorrect(matrix, row, col))  // If any of those values (1-9) can be valid
             {
-                backtrackingHelper(matrix, isFixed, newRow, newCol, data); // recursively move on to the next cell
+                backtrackingHelper(matrix, isFixed, newRow, newCol, data, currentAlgo); // recursively move on to the next cell
             }
         }
         if(data.cont === false) // Stopping entry 3
@@ -415,9 +516,20 @@ function backtrackingHelper(matrix, isFixed, row, col, data)
 
 // This function is called when backtracking function is running for too long
 // It will stop the function to prevent hanging
-function stopSolveSudokuBacktracking()
+function stopSolveSudokuBacktracking(currentAlgo)
 {
-    alert("Backtracking is a Naive Algorithm. This is taking too long due to exponential search. The program will terminate to prevent hanging.");
+    if(currentAlgo === "Backtracking")
+    {
+        alert("Backtracking is a Naive Algorithm. It tends to do well when the majority entries near the top are prefilled.\nThe program is taking too long to find a solution. It will be terminated to prevent hanging.");
+    }
+    else if(currentAlgo === "Reverse Backtracking")
+    {
+        alert("Reverse Backtracking is a Naive Algorithm. It tends to do well when the majority entries near the bottom are prefilled.\nThe program is taking too long to find a solution. It will be terminated to prevent hanging.");
+    }
+    else if(currentAlgo === "Spiral Backtracking")
+    {
+        alert("Spiral Backtracking is a Naive Algorithm. It tends to do well when the majority entries near 4 edges are prefilled.\nThe program is taking too long to find a solution. It will be terminated to prevent hanging.")
+    }
     clickedClear();
 }
 
@@ -506,6 +618,8 @@ function bfs(matrix)
     if(speedDropDown.innerHTML === 'Fast') bfsDuration = FAST_SPEED;
     else if(speedDropDown.innerHTML === 'Medium') bfsDuration = MEDIUM_SPEED;
     else if(speedDropDown.innerHTML === 'Slow') bfsDuration = SLOW_SPEED;
+    else if(speedDropDown.innerHTML === 'Extra Slow') bfsDuration = EXTRA_SLOW_SPEED;
+
 
     bfsTimeCount = 0;
 
@@ -681,6 +795,8 @@ function dancingLinks(matrix)
     if(speedDropDown.innerHTML === 'Fast') DancingLinksDuration = FAST_SPEED;
     else if(speedDropDown.innerHTML === 'Medium') DancingLinksDuration = MEDIUM_SPEED;
     else if(speedDropDown.innerHTML === 'Slow') DancingLinksDuration = SLOW_SPEED;
+    else if(speedDropDown.innerHTML === 'Extra Slow') DancingLinksDuration = EXTRA_SLOW_SPEED;
+
  
     DancingLinksTimeCount = 0;  // Time count for scheduling animation
 
@@ -963,44 +1079,54 @@ function succeededSpiralAnimation(currentTimeCount, currentDuration)
     let succeededDuration = 20;
     let newCount = 0;
 
-    let size = 9;
-    let row = 0;
-    let col = 0;
+    let size = 1;
+    let row = 4;
+    let col = 4;
+    let center = 4;
 
-    while(size > 0)
+    while(size <= 9)
     {
-        // Animation for the top row of our layer with size "size"
-        for(let j = col; j < col + size; j++)
+
+        // Animation for the left layer
+        for(let i = row; i >= center - Math.floor(size/2); i--)
         {
             timeOutIDSameForAnyAnimation = setTimeout(colorCell, 
-                                         currentTime + (newCount++)*succeededDuration, row, j);
+                currentTime + (newCount++)*succeededDuration, i, col);
         }
 
-        // Animation for the last column of our layer with size "size"
-        for(let i = row + 1; i < row + size; i++)
+        // Animation for the top layer
+        for(let j = col+1; j <= center + Math.floor(size/2); j++)
         {
             timeOutIDSameForAnyAnimation = setTimeout(colorCell, 
-                                         currentTime + (newCount++)*succeededDuration, i, col+size-1);
+                currentTime + (newCount++)*succeededDuration, center-Math.floor(size/2), j);
         }
 
-        // Animation for the last row of our layer with size "size"
-        for(let j = col + size - 2; j >= col; j--)
+        // Animation for the right layer
+        for(let i = center-Math.floor(size/2)+1; i <= center + Math.floor(size/2); i++)
         {
             timeOutIDSameForAnyAnimation = setTimeout(colorCell, 
-                                        currentTime + (newCount++)*succeededDuration, row+size-1, j);
+                currentTime + (newCount++)*succeededDuration, i, center + Math.floor(size/2));
         }
 
-        // Animation for the first column of our layer with size "size"
-        for(let i = row + size - 2; i >= row+1; i--)
+        // Animation for the bottom layer
+        for(let j = center + Math.floor(size/2)-1; j >= center - Math.floor(size/2); j--)
         {
             timeOutIDSameForAnyAnimation = setTimeout(colorCell, 
-                                        currentTime + (newCount++)*succeededDuration, i, col);
+                currentTime + (newCount++)*succeededDuration, center+Math.floor(size/2), j);
         }
 
         // Update row, col and size
-        size -= 2;
-        row++;
-        col++;
+        size += 2;
+        if(row === center && col === center) // If we're at the center
+        {
+            row = row;  // Row stays the same
+            col--;      // Column decreases by 1
+        }
+        else
+        {
+            row++;
+            col--;
+        }
     }
 
     timeOutIDSameForAnyAnimation = setTimeout(setAllowSolveSpeedAndAlgorithms, currentTime + (newCount++)*succeededDuration);
@@ -1120,6 +1246,8 @@ function getCurrentAlgorithm()
     if(algorithmsDropDown.html === "Backtracking") currentAlgo = "Backtracking";
     else if(algorithmsDropDown.innerHTML === "Best First Search") currentAlgo = "BFS";
     else if(algorithmsDropDown.innerHTML === "Dancing Links") currentAlgo = "Dancing Links";
+    else if(algorithmsDropDown.innerHTML === "Reverse Backtracking") currentAlgo = "Reverse Backtracking";
+    else if(algorithmsDropDown.innerHTML === "Spiral Backtracking") currentAlgo = "Spiral Backtracking";
 
     return currentAlgo;
 }
