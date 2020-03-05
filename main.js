@@ -1,3 +1,17 @@
+// Get some element from html
+const subMenu = document.querySelector("#nav-bar").children[4].children[1];         
+const speedButton = document.querySelector("#nav-bar").children[4].children[0];
+const liAroundSpeedDropdownMenu = document.querySelector("#nav-bar").children[4];
+const liAroundAlgoDropdownMenu = document.querySelector("#nav-bar").children[5];
+const solve = document.querySelector("#solve");
+const clear = document.querySelector("#clear");
+const randomlyFill = document.querySelector("#randomly-fill");
+const grid = document.querySelector("#grid");
+const inputs = document.getElementsByTagName('input');
+const algoInfo = document.querySelector("#algo-info-info");
+const algoHeader = document.querySelector("#algo-info-header");
+const algoInfoWraper = document.querySelector("#algo-info");
+
 // START Dropdown menu (Speed)
 const speedDropDown = document.querySelector("span.selected");
 const speedOptions = document.querySelectorAll('.speed-options');
@@ -16,22 +30,12 @@ algorithmsOptions.forEach(e => {
     e.addEventListener("click", () => {
         let value = e.innerHTML;
         algorithmsDropDown.innerHTML = value;
+        setAlgoInfo(value);
     });
 });
 // DONE Dropdown menu (Algorithms)
 
-// Get some element from html
-const subMenu = document.querySelector("#nav-bar").children[4].children[1];         
-const speedButton = document.querySelector("#nav-bar").children[4].children[0];
-const liAroundSpeedDropdownMenu = document.querySelector("#nav-bar").children[4];
-const liAroundAlgoDropdownMenu = document.querySelector("#nav-bar").children[5];
-const solve = document.querySelector("#solve");
-const clear = document.querySelector("#clear");
-const randomlyFill = document.querySelector("#randomly-fill");
-const grid = document.querySelector("#grid");
-const inputs = document.getElementsByTagName('input');
-
-// CONSTANT SPEED (The lower the faster. It's actually is the time lapse between 2 animation)
+// CONSTANT SPEED (The lower the faster. It actually is the time lapse between 2 animation)
 const FAST_SPEED = 1;
 const MEDIUM_SPEED = 10;
 const SLOW_SPEED = 50;
@@ -42,12 +46,86 @@ clear.addEventListener('click', clickedClear);
 randomlyFill.addEventListener('click', clickedRandomlyFill);
 solve.addEventListener('click', clickedSolve);
 
+function setAlgoInfo(algoName)
+{
+    let description = "";
+
+    if(algoName === "Backtracking")
+    {
+        description = "Sudoku Backtracking is a recursive algorithm which goes through each cells and sequentially assigns numbers from 1 to 9 if the cell is empty.<br/><br/>" +  
+
+        "After each assignment, we check whether the current board is valid, and recursively go to the next cell if it is.<br/><br/>" + 
+        
+        "If we reach the last (bottom right corner) cell, and we have a valid assignment to that cell, we have a solution.<br/><br/>" +
+        
+        "If we have tried all possible values from 1 to 9 on a cell, and no values lead to a solution, we backtrack (go back to the previous cell) and continue where we left off (continue to assign the next number).";
+    }
+    else if(algoName === "Best First Search")
+    {
+        description = "Best first search algorithms is an optimized version of Backtracking, where the “next cell” is the cell which has the least number of possibilities.<br/><br/>"+
+
+        "The 'number of possibilities' is calculated for each cell, by going through its corresponding row, column and 3x3 block and counting the number of have-not-chosen numbers.<br/><br/>"+
+        
+        "This greedy heuristic increase the efficiency of the program substantially, as it minimizes the branching factor.";
+    }
+    else if(algoName === "Dancing Links")
+    {
+        description = "Dancing Links (also known as Algorithm X) is a technique to find all solutions of the exact cover problem (A well known NP-complete problem) using depth first search in an efficient way (Although the time complexity is still exponential).<br/><br/>"+
+
+        "Turns out, Sudoku can be represented as an exact cover problem, and therefore can be solved by Algorithm X efficiently.<br/><br/>"+
+        
+        "Dancing Links uses a 4-way linked list to enable efficient searching and removing along rows and columns. It also uses a greedy “best-first” heuristic, which makes the animation runs similarly to Best – First Search.<br/><br/>"+
+        
+        "For more infomation, please check out the author's paper: <a href = 'http://www.ocf.berkeley.edu/~jchu/publicportal/sudoku/0011047.pdf'>http://www.ocf.berkeley.edu/~jchu/publicportal/sudoku/0011047.pdf</a>";
+        
+    }
+    else if(algoName === "Reverse Backtracking")
+    {
+        description = "Reverse Backtracking is a modified version of the Backtracking algorithm. Instead of picking the next cell top to bottom and left to right, it picks the next cell bottom to top, right to left.<br/><br/>"+
+
+        "The Algorithm tends to do well when the majority entries near the bottom are prefilled.<br/><br/>" +
+
+        "In terms of time complexity, there is no substantial difference between Reverse Backtracking and normal Backtracking";
+    }
+    else if(algoName === "Spiral Backtracking")
+    {
+        description = "Spiral Backtracking is another modified version of the Backtracking algorithm. Instead of picking the next cell top to bottom and left to right, it picks the next cell in an inward spiral.<br/><br/>"+
+
+        "The Algorithm tends to do well when the majority entries near 4 edges are prefilled.<br/><br/>" +
+
+        "Interestingly, this Algorithm is significantly slower than normal Backtracking Algorithm in most cases. The reason for this might lie in the nature of Sudoku, which makes choosing next cells spirally a poor choice."
+    }
+
+
+    algoInfoWraper.classList.add('algo-info-class');
+
+    algoHeader.innerHTML = "Algorithm Information";
+    algoInfo.innerHTML = description;
+}
+
+
+
 //-------------------------------------------------START ClickedClear-------------------------------------------------
 //-------------------------------------------------START ClickedClear-------------------------------------------------
 //-------------------------------------------------START ClickedClear-------------------------------------------------
 
 // This function clears all timeouts, animation colors and allow to press Solve and Speed again
 function clickedClear(e)
+{
+    clearAllTimeOuts();
+    clearAllColors();
+    clearAlgoInfo();
+    setAllowSolveSpeedAndAlgorithms();
+    for(let i = 0; i < 9; i++)
+    {
+        for(let j = 0; j < 9; j++)
+        {
+            grid.rows[i].cells[j].firstChild.value = "";
+        }
+    }
+}
+
+function clickedClearExceptAlgoInfo()
 {
     clearAllTimeOuts();
     clearAllColors();
@@ -79,6 +157,14 @@ function clearAllColors()
         inputs[i].classList.remove('active');
         inputs[i].classList.remove('succeeded');
     }
+}
+
+// Clear Algo description   
+function clearAlgoInfo()
+{
+    algoInfoWraper.classList.remove('algo-info-class');
+    algoHeader.innerHTML = "";
+    algoInfo.innerHTML = "";
 }
 
 // Allow to click solve, choose speed and algorithms again
@@ -115,7 +201,7 @@ function setNotAllowSolveSpeedAndAlgorithms()
 // This function is called when we click the "Randomly-fill" button
 function clickedRandomlyFill(e)
 {
-    clickedClear()  // Clear the board first
+    clickedClearExceptAlgoInfo();  // Clear the board first
     fill80Succeed20NotSure();
 }
 
@@ -268,7 +354,10 @@ function clickedSolve(e)
         speedDropDown.innerHTML = "Medium"; // Set to medium
 
     if(algorithmsDropDown.innerHTML === "Algorithms") // If haven't set Algorithms yet
+    {
         algorithmsDropDown.innerHTML = "Backtracking"; // Set to Backtracking
+        setAlgoInfo("Backtracking");                    // And turn on info
+    }
     
     let currentAlgo = getCurrentAlgorithm();
 
@@ -452,39 +541,6 @@ function backtrackingHelper(matrix, isFixed, row, col, data, currentAlgo)
         {
             newRow = row -1; // Go up
         }
-
-
-        // Below is inside out spiral. It's too slow :((
-        // Use this for animation :)))
-        // // Initialize to current row and column
-        // newRow = row;
-        // newCol = col;
-
-        // // Fill spiral
-        // let center = Math.floor(matrix.length / 2);
-        // let size = Math.max((Math.abs(row-center)+1)*2-1, (Math.abs(col-center)+1)*2-1); // Current layer size
-        
-        // if(row === center && col === center)    // If we're at the center
-        // {
-        //     newCol = col - 1; // Go left
-        // }
-        // else if(row === center + Math.floor(size / 2))
-        // {
-        //     newCol = col-1; // Go left
-        // }
-        // else if(col === center - Math.floor(size / 2) && row != center - Math.floor(size / 2) 
-        //         && row != center + Math.floor(size / 2))
-        // {
-        //     newRow = row - 1;   // Go up
-        // }
-        // else if(row === center - Math.floor(size / 2) && col != center + Math.floor(size / 2))
-        // {
-        //     newCol = col + 1; // Go right
-        // }
-        // else if(col === center + Math.floor(size / 2) && row != center + Math.floor(size / 2))
-        // {
-        //     newRow = row + 1;   // Go down
-        // }
     }
     
     // If this entry is user input and is valid

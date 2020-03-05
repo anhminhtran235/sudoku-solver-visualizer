@@ -153,6 +153,36 @@ body
 /* END Menu-Style.Algorithms dropdown */
 
 
+/* START algo-info style */
+.algo-info-class
+{
+    background-color: rgb(49, 155, 255);
+    word-wrap: break-word;
+    margin-left: 2.5%;
+    width: 25%;
+    float: left;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+#algo-info-info
+{
+    color: #5d1212;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+#algo-info-header
+{
+    color: #5d1212;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 20px;
+    font-weight: 500;
+    font-style: italic;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+/* END algo-info style */
 
 /* START main div style */
 /* START main-div.General Style */
@@ -167,7 +197,8 @@ body
 /* START main-div.Table style */
 #grid 
 {
-    margin: auto;
+    /* margin: auto; */
+    margin-left: 30%;
     border-collapse: collapse;
     width: 378px;
     height: 395px;
