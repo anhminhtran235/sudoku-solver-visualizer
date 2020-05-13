@@ -1,4 +1,4 @@
-# sudoku-solver-visualizer
+# Sudoku Solver Visualizer
 
 # 1/ About this project
 
