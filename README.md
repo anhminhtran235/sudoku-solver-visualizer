@@ -17,3 +17,7 @@ I wrote 4 Algorithms completely on my own. For Dancing Links (This is a quite ch
 # 2/ Web app version
 
 I also deploy this code to the web. Please check it out here: https://anhminhtran235.github.io/sudoku-solver-visualizer/
+
+March 2020
+
+Created by Anh Minh Tran
