@@ -3,7 +3,7 @@ I learned Javascript, HTML and CSS in only 2 weeks and then I started this proje
 
 I implemented 5 Algorithms in this project: Backtracking, Dancing Links (Algorithm X), Greedy Best First Search, Reverse Backtracking and Sprial Backtracking. 
 
-I wrote 4 Algorithms on my own. For Dancing Links (This is a quite challenging Algorithms to implement, since you need to do depth first search on a 4-way linked list. One bug and the whole program breaks), I use the following sources:
+I wrote 4 Algorithms completely on my own. For Dancing Links (This is a quite challenging Algorithms to implement, since you need to do depth first search on a 4-way linked list. One bug and the whole program breaks), I use the following sources:
 
 1/ The author's paper: http://www.ocf.berkeley.edu/~jchu/publicportal/sudoku/0011047.pdf
 
