@@ -162,7 +162,14 @@ body
     width: 25%;
     float: left;
     padding: 10px;
-    box-sizing: border-box;
+}
+
+#algo-info
+{
+    text-align: left;
+    padding: 10px;
+    margin-left: 15px;
+    position: absolute;
 }
 
 #algo-info-info
@@ -179,6 +186,8 @@ body
     font-weight: 500;
     font-style: italic;
     text-align: center;
+    align-items: center;
+    margin: auto;
     margin-bottom: 5px;
 }
 
@@ -189,7 +198,8 @@ body
 #main
 {
     margin-top: 40px;
-    position: relative;
+    /* position: relative; */
+    text-align: center;
     z-index: 0;
 }
 /* END main-div.General Style */
@@ -198,7 +208,7 @@ body
 #grid 
 {
     /* margin: auto; */
-    margin-left: 30%;
+    margin: auto;
     border-collapse: collapse;
     width: 378px;
     height: 395px;

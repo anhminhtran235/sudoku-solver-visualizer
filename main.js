@@ -62,7 +62,7 @@ function setAlgoInfo(algoName)
     }
     else if(algoName === "Best First Search")
     {
-        description = "Best first search algorithms is an optimized version of Backtracking, where the “next cell” is the cell which has the least number of possibilities.<br/><br/>"+
+        description = "Best first search algorithm is an optimized version of Backtracking, where the “next cell” is the cell which has the least number of possibilities.<br/><br/>"+
 
         "The 'number of possibilities' is calculated for each cell, by going through its corresponding row, column and 3x3 block and counting the number of have-not-chosen numbers.<br/><br/>"+
         
@@ -74,7 +74,7 @@ function setAlgoInfo(algoName)
 
         "Turns out, Sudoku can be represented as an exact cover problem, and therefore can be solved by Algorithm X efficiently.<br/><br/>"+
         
-        "Dancing Links uses a 4-way linked list to enable efficient searching and removing along rows and columns. It also uses a greedy “best-first” heuristic, which makes the animation runs similarly to Best – First Search.<br/><br/>"+
+        "Dancing Links uses a 4-way linked list to enable efficient searching and removing along rows and columns. It also uses a greedy “best-first” heuristic, which makes the animation run similarly to Best – First Search.<br/><br/>"+
         
         "For more infomation, please check out the author's paper: <a href = 'http://www.ocf.berkeley.edu/~jchu/publicportal/sudoku/0011047.pdf'>http://www.ocf.berkeley.edu/~jchu/publicportal/sudoku/0011047.pdf</a>";
         
@@ -85,7 +85,7 @@ function setAlgoInfo(algoName)
 
         "The Algorithm tends to do well when the majority entries near the bottom are prefilled.<br/><br/>" +
 
-        "In terms of time complexity, there is no substantial difference between Reverse Backtracking and normal Backtracking";
+        "In terms of the average time taken to solve a Sudoku puzzle, there is no substantial difference between Reverse Backtracking and normal Backtracking";
     }
     else if(algoName === "Spiral Backtracking")
     {
@@ -576,15 +576,15 @@ function stopSolveSudokuBacktracking(currentAlgo)
 {
     if(currentAlgo === "Backtracking")
     {
-        alert("Backtracking is a Naive Algorithm. It tends to do well when the majority entries near the top are prefilled.\nThe program is taking too long to find a solution. It will be terminated to prevent hanging.");
+        alert("Backtracking is a Naive Algorithm. It tends to do well when the majority of entries near the top are prefilled.\nThe program is taking too long to find a solution. It will be terminated to prevent hanging.");
     }
     else if(currentAlgo === "Reverse Backtracking")
     {
-        alert("Reverse Backtracking is a Naive Algorithm. It tends to do well when the majority entries near the bottom are prefilled.\nThe program is taking too long to find a solution. It will be terminated to prevent hanging.");
+        alert("Reverse Backtracking is a Naive Algorithm. It tends to do well when the majority of entries near the bottom are prefilled.\nThe program is taking too long to find a solution. It will be terminated to prevent hanging.");
     }
     else if(currentAlgo === "Spiral Backtracking")
     {
-        alert("Spiral Backtracking is a Naive Algorithm. It tends to do well when the majority entries near 4 edges are prefilled.\nThe program is taking too long to find a solution. It will be terminated to prevent hanging.")
+        alert("Spiral Backtracking is a Naive Algorithm. It tends to do well when the majority of entries near 4 edges are prefilled.\nThe program is taking too long to find a solution. It will be terminated to prevent hanging.")
     }
     clickedClear();
 }
@@ -694,7 +694,7 @@ function solveSudokuBFSHelper(matrix)
     {
         for(let j = 0; j < 9; j++)
         {
-            if(matrix[i][j] === 0)  // If it is empty
+            if (matrix[i][j] === 0)  // If it is unfilled
             {
                 let numChoices = countChoices(matrix, i, j);
                 if(bestCandidate.choices > numChoices)
@@ -705,7 +705,7 @@ function solveSudokuBFSHelper(matrix)
         }
     }
 
-    // If don't find any
+    // If don't find any choices
     if(bestCandidate.choices === 100)   // Has filled all board, Best-First Search done! Note, whether we have a solution or not depends on whether allBoardNonZero() returns true
     {
         bfsCont = false; // Set the flag so that the rest of the recursive calls can stop at "stopping points"
@@ -714,7 +714,8 @@ function solveSudokuBFSHelper(matrix)
    
     let row = bestCandidate.row;
     let col = bestCandidate.col;
-    // If find the best candidate, fill 1-9
+
+    // If found the best candidate, fill 1-9
     for(let j = 1; j <= 9; j++)
     {
         if(!bfsCont)    // Stopping point 2
@@ -731,7 +732,7 @@ function solveSudokuBFSHelper(matrix)
     }
     if(!bfsCont)    // Stopping point 3
         return;
-    matrix[row][col] = 0;
+    matrix[row][col] = 0; // Backtrack, mark the current cell empty again
     timeOutIDSameForAnyAnimation = setTimeout(emptyCell, (bfsTimeCount++)*bfsDuration, row, col);
 }
 
